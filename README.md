@@ -7,7 +7,8 @@ glued together to make a surprisingly good result.
 
 Apiary, the company behind API Blueprint, was acquired by Oracle a while back
 and now they're closing their doors for good. API Blueprint has therefore been
-left abandoned, so it's time to hop on over to the OpenAPI ecosystem.
+left abandoned, so it's time to hop on over to the OpenAPI ecosystem. Ideally
+you'll use this repo to help migrate, then never look back.
 
 ## How it works
 
@@ -56,3 +57,19 @@ $ npm exec bump preview generated/apispecconverter.31.yaml
 > Your preview is visible at: https://bump.sh/preview/9b563ce6-e1a5-4da6-8f5d-d51ae0b26c1d (Expires at 2025-06-27T17:49:34+02:00)
 > * Let's render a preview on Bump.sh... done
 ```
+
+## Underlying Tools
+
+This conversion process is using a few different tools. 
+
+- [Lucybot API Spec Converter](https://github.com/LucyBot-Inc/api-spec-converter) - A JavaScript library that converts API Blueprint to OpenAPI v3.0.
+- [apib2openapi](https://www.npmjs.com/package/apib2openapi) - A JavaScript library that converts API Blueprint to OpenAPI v3.0.
+- [openapi-format](https://www.npmjs.com/package/openapi-format) - A JavaScript
+  library that formats OpenAPI documents to be more readable and to upgrade
+  OpenAPI v3.0 to v3.1.
+- [Bump.sh CLI](https://www.npmjs.com/package/bump-cli) - Renders OpenAPI documents as a preview, so you can see how they
+  look without having to run a local server.
+
+## Customization
+
+Using OpenAPI Format was particularly helpful, as all of the conversion tools alone were generating unhelpful output, with invalid `operationId`. OepnAPI Format allowed us to override the `operationId`, using customizations in the `config/openapi-format.js` file. See more customization options in the [OpenAPI Format documentation](https://github.com/thim81/openapi-format?tab=readme-ov-file#openapi-formatting-configuration-options)
