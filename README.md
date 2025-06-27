@@ -1,2 +1,52 @@
-# apiblueprint2openapi
-Migrate API Blueprint to OpenAPI v3.1 with a few tools glued together.
+# Apiblueprint to OpenAPI
+
+Migrate API Blueprint to OpenAPI v3.1 with a few different tools that have been
+glued together to make a surprisingly good result. 
+
+## Why would we need that?
+
+Apiary, the company behind API Blueprint, was acquired by Oracle a while back and now they're closing their doors for good. API Blueprint has therefore been left abandoned, so it's time to hop on over to the OpenAPI ecosystem.
+
+## How it works
+
+Clone this repository, and replace `original.apib` with your API Blueprint downloaded from Apiary or wherever it happens to live.
+
+```shell
+git clone git@github.com:bump-sh-examples/apiblueprint2openapi.git
+
+cd apiblueprint2openapi
+
+cp ~/src/my-project/example-api/latest.apib ./original.apib
+```
+
+With this in place, run NPM installer as all the best/latest/current tooling for this happens to be JavaScript based.
+
+```shell
+npm install
+
+npm run convert
+```
+
+The conversion script should create a few files in `generated/`, with output from two different conversion scripts so you can see which you prefer.
+
+- `apib2openapi.yaml` - Using NPM module `apib2openapi` to produce OpenAPI v3.0.
+- `apib2openapi.31.yaml` - Upgraded `apib2openapi` output with `openapi-format` to produce OpenAPI v3.1 and generally tidied up.
+- `apispecconverter.yaml` - Using NPM module `apib2openapi` to produce OpenAPI v3.0.
+- `apispecconverter.31.yaml` - Upgraded `apib2openapi` output with `openapi-format` to produce OpenAPI v3.1 and generally tidied up.0.
+
+This is probably a lot to think about so to keep it simple, you probably want to use `generated/apispecconverter.31.yaml`.
+
+```shell
+cp generated/apispecconverter.31.yaml ~/src/my-project/example-api/openapi.yaml
+```
+
+## Preview Generated OpenAPI
+
+Want to see how they look with zero effort involved? 
+
+```shell
+$ npm exec bump preview generated/apispecconverter.31.yaml
+
+> Your preview is visible at: https://bump.sh/preview/9b563ce6-e1a5-4da6-8f5d-d51ae0b26c1d (Expires at 2025-06-27T17:49:34+02:00)
+> * Let's render a preview on Bump.sh... done
+```

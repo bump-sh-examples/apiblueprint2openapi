@@ -2,6 +2,7 @@
   "dependencies": {
     "api-spec-converter": "^2.12.0",
     "apib2openapi": "^0.1.5",
+    "bump-cli": "^2.9.5",
     "openapi-format": "^1.27.0"
   },
   "scripts": {
