@@ -1,0 +1,925 @@
+FORMAT: 1A
+HOST: https://example.com/api
+
+# Train Travel API
+API for finding and booking train trips across Europe.
+
+## Authentication
+This API uses OAuth v2 Authorization Code Grant for its authentication.
+
+The properties required for this OAuth implementation are as follows:
++ Access Token Url - /token
++ Authorization Url - /authorize
+
+# Group Stations
+
+Find and filter train stations across Europe, including their location
+and local timezone.
+
+
+## Stations [/stations{?page,limit,coordinates,search,country}]
+
+### Get stations [GET]
+Returns a paginated and searchable list of all train stations.
++ Parameters
+    + page (number, optional) -
+
+        The page number to return
+
+        + Default: 1
+        + Sample: 1
+    + limit (number, optional) -
+
+        The number of items to return per page
+
+        + Default: 10
+        + Sample: 10
+    + coordinates (string, optional)
+
+        The latitude and longitude of the user's location, to narrow down the search results to sites within a proximity of this location.
+
+        + Sample: 52.5200,13.4050
+    + search (string, optional)
+
+        A search term to filter the list of stations by name or address.
+
+    + country (string, optional)
+
+        Filter stations by country code
+
+        + Sample: DE
+
++ Response 200 (application/json)
+
+        OK
+
+    + Attributes (Stations Response)
+
+
+    + Body
+
+            {"data":[{"id":"efdbb9d1-02c2-4bc3-afb7-6788d8782b1e","name":"Berlin Hauptbahnhof","address":"Invalidenstraße 10557 Berlin, Germany","country_code":"DE","timezone":"Europe/Berlin"},{"id":"b2e783e1-c824-4d63-b37a-d8d698862f1d","name":"Paris Gare du Nord","address":"18 Rue de Dunkerque 75010 Paris, France","country_code":"FR","timezone":"Europe/Paris"}],"links":{"self":"https://api.example.com/stations&page=2","next":"https://api.example.com/stations?page=3","prev":"https://api.example.com/stations?page=1"}}
+
+
++ Response 400 (application/problem+json)
+
+        Bad Request
+
+    + Attributes (Problem)
+
+    + Body
+
+            {"type":"https://example.com/errors/bad-request","title":"Bad Request","status":400,"detail":"The request is invalid or missing required parameters."}
+
++ Response 401 (application/problem+json)
+
+        Unauthorized
+
+    + Attributes (Problem)
+
+    + Body
+
+            {"type":"https://example.com/errors/unauthorized","title":"Unauthorized","status":401,"detail":"You do not have the necessary permissions."}
+
++ Response 403 (application/problem+json)
+
+        Forbidden
+
+    + Attributes (Problem)
+
+    + Body
+
+            {"type":"https://example.com/errors/forbidden","title":"Forbidden","status":403,"detail":"Access is forbidden with the provided credentials."}
+
++ Response 429 (application/problem+json)
+
+        Too Many Requests
+
+    + Attributes (Problem)
+
+    + Body
+
+            {"type":"https://example.com/errors/too-many-requests","title":"Too Many Requests","status":429,"detail":"You have exceeded the rate limit."}
+
++ Response 500 (application/problem+json)
+
+        Internal Server Error
+
+    + Attributes (Problem)
+
+    + Body
+
+            {"type":"https://example.com/errors/internal-server-error","title":"Internal Server Error","status":500,"detail":"An unexpected error occurred."}
+
+
+
+# Group Trips
+
+Timetables and routes for train trips between stations, including pricing
+and availability.
+
+
+## Trips [/trips{?page,limit,origin,destination,date,bicycles,dogs}]
+
+### Get trips [GET]
+Returns a list of available train trips between the specified origin and destination stations on the given date, and allows for filtering by bicycle and dog allowances.
++ Parameters
+    + page (number, optional) -
+
+        The page number to return
+
+        + Default: 1
+        + Sample: 1
+    + limit (number, optional) -
+
+        The number of items to return per page
+
+        + Default: 10
+        + Sample: 10
+    + origin (string, required)
+
+        The ID of the origin station
+
+        + Sample: efdbb9d1-02c2-4bc3-afb7-6788d8782b1e
+    + destination (string, required)
+
+        The ID of the destination station
+
+        + Sample: b2e783e1-c824-4d63-b37a-d8d698862f1d
+    + date (string, required)
+
+        The date and time of the trip in ISO 8601 format in origin station's timezone.
+
+        + Sample: 2024-02-01T09:00:00Z
+    + bicycles (boolean, optional) -
+
+        Only return trips where bicycles are known to be allowed
+
+        + Default: false
+        + Sample: false
+    + dogs (boolean, optional) -
+
+        Only return trips where dogs are known to be allowed
+
+        + Default: false
+        + Sample: false
+
++ Response 200 (application/json)
+
+        A list of available train trips
+
+    + Attributes (Trips Response)
+
+
+    + Body
+
+            {"data":[{"id":"ea399ba1-6d95-433f-92d1-83f67b775594","origin":"efdbb9d1-02c2-4bc3-afb7-6788d8782b1e","destination":"b2e783e1-c824-4d63-b37a-d8d698862f1d","departure_time":"2024-02-01T10:00:00Z","arrival_time":"2024-02-01T16:00:00Z","price":50,"operator":"Deutsche Bahn","bicycles_allowed":true,"dogs_allowed":true,"links":{"self":"https://api.example.com/trips/ea399ba1-6d95-433f-92d1-83f67b775594","origin":"https://api.example.com/stations/efdbb9d1-02c2-4bc3-afb7-6788d8782b1e","destination":"https://api.example.com/stations/b2e783e1-c824-4d63-b37a-d8d698862f1d"}},{"id":"4d67459c-af07-40bb-bb12-178dbb88e09f","origin":"b2e783e1-c824-4d63-b37a-d8d698862f1d","destination":"efdbb9d1-02c2-4bc3-afb7-6788d8782b1e","departure_time":"2024-02-01T12:00:00Z","arrival_time":"2024-02-01T18:00:00Z","price":50,"operator":"SNCF","bicycles_allowed":true,"dogs_allowed":true,"links":{"self":"https://api.example.com/trips/4d67459c-af07-40bb-bb12-178dbb88e09f","origin":"https://api.example.com/stations/b2e783e1-c824-4d63-b37a-d8d698862f1d","destination":"https://api.example.com/stations/efdbb9d1-02c2-4bc3-afb7-6788d8782b1e"}}],"links":{"self":"https://api.example.com/trips?origin=efdbb9d1-02c2-4bc3-afb7-6788d8782b1e&destination=b2e783e1-c824-4d63-b37a-d8d698862f1d&date=2024-02-01","next":"https://api.example.com/trips?origin=efdbb9d1-02c2-4bc3-afb7-6788d8782b1e&destination=b2e783e1-c824-4d63-b37a-d8d698862f1d&date=2024-02-01&page=2"}}
+
+
++ Response 400 (application/problem+json)
+
+        Bad Request
+
+    + Attributes (Problem)
+
+    + Body
+
+            {"type":"https://example.com/errors/bad-request","title":"Bad Request","status":400,"detail":"The request is invalid or missing required parameters."}
+
++ Response 401 (application/problem+json)
+
+        Unauthorized
+
+    + Attributes (Problem)
+
+    + Body
+
+            {"type":"https://example.com/errors/unauthorized","title":"Unauthorized","status":401,"detail":"You do not have the necessary permissions."}
+
++ Response 403 (application/problem+json)
+
+        Forbidden
+
+    + Attributes (Problem)
+
+    + Body
+
+            {"type":"https://example.com/errors/forbidden","title":"Forbidden","status":403,"detail":"Access is forbidden with the provided credentials."}
+
++ Response 429 (application/problem+json)
+
+        Too Many Requests
+
+    + Attributes (Problem)
+
+    + Body
+
+            {"type":"https://example.com/errors/too-many-requests","title":"Too Many Requests","status":429,"detail":"You have exceeded the rate limit."}
+
++ Response 500 (application/problem+json)
+
+        Internal Server Error
+
+    + Attributes (Problem)
+
+    + Body
+
+            {"type":"https://example.com/errors/internal-server-error","title":"Internal Server Error","status":500,"detail":"An unexpected error occurred."}
+
+
+
+# Group Bookings
+
+Create and manage bookings for train trips, including passenger details
+and optional extras.
+
+
+## Bookings [/bookings{?page,limit}]
+
+### Get bookings [GET]
+Returns a list of all trip bookings by the authenticated user.
++ Parameters
+    + page (number, optional) -
+
+        The page number to return
+
+        + Default: 1
+        + Sample: 1
+    + limit (number, optional) -
+
+        The number of items to return per page
+
+        + Default: 10
+        + Sample: 10
+
++ Response 200 (application/json)
+
+        A list of bookings
+
+    + Attributes (Bookings Response)
+
+
+    + Body
+
+            {"data":[{"id":"efdbb9d1-02c2-4bc3-afb7-6788d8782b1e","trip_id":"efdbb9d1-02c2-4bc3-afb7-6788d8782b1e","passenger_name":"John Doe","has_bicycle":true,"has_dog":true},{"id":"b2e783e1-c824-4d63-b37a-d8d698862f1d","trip_id":"b2e783e1-c824-4d63-b37a-d8d698862f1d","passenger_name":"Jane Smith","has_bicycle":false,"has_dog":false}],"links":{"self":"https://api.example.com/bookings","next":"https://api.example.com/bookings?page=2"}}
+
+
++ Response 400 (application/problem+json)
+
+        Bad Request
+
+    + Attributes (Problem)
+
+    + Body
+
+            {"type":"https://example.com/errors/bad-request","title":"Bad Request","status":400,"detail":"The request is invalid or missing required parameters."}
+
++ Response 401 (application/problem+json)
+
+        Unauthorized
+
+    + Attributes (Problem)
+
+    + Body
+
+            {"type":"https://example.com/errors/unauthorized","title":"Unauthorized","status":401,"detail":"You do not have the necessary permissions."}
+
++ Response 403 (application/problem+json)
+
+        Forbidden
+
+    + Attributes (Problem)
+
+    + Body
+
+            {"type":"https://example.com/errors/forbidden","title":"Forbidden","status":403,"detail":"Access is forbidden with the provided credentials."}
+
++ Response 429 (application/problem+json)
+
+        Too Many Requests
+
+    + Attributes (Problem)
+
+    + Body
+
+            {"type":"https://example.com/errors/too-many-requests","title":"Too Many Requests","status":429,"detail":"You have exceeded the rate limit."}
+
++ Response 500 (application/problem+json)
+
+        Internal Server Error
+
+    + Attributes (Problem)
+
+    + Body
+
+            {"type":"https://example.com/errors/internal-server-error","title":"Internal Server Error","status":500,"detail":"An unexpected error occurred."}
+
+
+## Bookings [/bookings]
+
+### Create booking [POST]
+A booking is a temporary hold on a trip. It is not confirmed until the payment is processed.
+
++ Request (<<Add Header Value>>)
+
+    + Attributes (Booking)
+
+
+
++ Response 201 (application/json)
+
+        Booking successful
+
+    + Attributes (Bookings Response2)
+
+
+    + Body
+
+            {"id":"efdbb9d1-02c2-4bc3-afb7-6788d8782b1e","trip_id":"efdbb9d1-02c2-4bc3-afb7-6788d8782b1e","passenger_name":"John Doe","has_bicycle":true,"has_dog":true,"links":{"self":"https://api.example.com/bookings/efdbb9d1-02c2-4bc3-afb7-6788d8782b1e"}}
+
+
++ Response 400 (application/problem+json)
+
+        Bad Request
+
+    + Attributes (Problem)
+
+    + Body
+
+            {"type":"https://example.com/errors/bad-request","title":"Bad Request","status":400,"detail":"The request is invalid or missing required parameters."}
+
++ Response 401 (application/problem+json)
+
+        Unauthorized
+
+    + Attributes (Problem)
+
+    + Body
+
+            {"type":"https://example.com/errors/unauthorized","title":"Unauthorized","status":401,"detail":"You do not have the necessary permissions."}
+
++ Response 404 (application/problem+json)
+
+        Not Found
+
+    + Attributes (Problem)
+
+    + Body
+
+            {"type":"https://example.com/errors/not-found","title":"Not Found","status":404,"detail":"The requested resource was not found."}
+
++ Response 409 (application/problem+json)
+
+        Conflict
+
+    + Attributes (Problem)
+
+    + Body
+
+            {"type":"https://example.com/errors/conflict","title":"Conflict","status":409,"detail":"There is a conflict with an existing resource."}
+
++ Response 429 (application/problem+json)
+
+        Too Many Requests
+
+    + Attributes (Problem)
+
+    + Body
+
+            {"type":"https://example.com/errors/too-many-requests","title":"Too Many Requests","status":429,"detail":"You have exceeded the rate limit."}
+
++ Response 500 (application/problem+json)
+
+        Internal Server Error
+
+    + Attributes (Problem)
+
+    + Body
+
+            {"type":"https://example.com/errors/internal-server-error","title":"Internal Server Error","status":500,"detail":"An unexpected error occurred."}
+
+
+## Bookings By BookingId [/bookings/{bookingId}]
+
++ Parameters
+    + bookingId (string, required)
+
+        The ID of the booking to retrieve.
+
+        + Sample: 1725ff48-ab45-4bb5-9d02-88745177dedb
+
+### Get booking [GET]
+Returns the details of a specific booking.
+
++ Response 200 (application/json)
+
+        The booking details
+
+    + Attributes (Bookings Response2)
+
+
+    + Body
+
+            {"id":"efdbb9d1-02c2-4bc3-afb7-6788d8782b1e","trip_id":"efdbb9d1-02c2-4bc3-afb7-6788d8782b1e","passenger_name":"John Doe","has_bicycle":true,"has_dog":true,"links":{"self":"https://api.example.com/bookings/1725ff48-ab45-4bb5-9d02-88745177dedb"}}
+
+
++ Response 400 (application/problem+json)
+
+        Bad Request
+
+    + Attributes (Problem)
+
+    + Body
+
+            {"type":"https://example.com/errors/bad-request","title":"Bad Request","status":400,"detail":"The request is invalid or missing required parameters."}
+
++ Response 401 (application/problem+json)
+
+        Unauthorized
+
+    + Attributes (Problem)
+
+    + Body
+
+            {"type":"https://example.com/errors/unauthorized","title":"Unauthorized","status":401,"detail":"You do not have the necessary permissions."}
+
++ Response 403 (application/problem+json)
+
+        Forbidden
+
+    + Attributes (Problem)
+
+    + Body
+
+            {"type":"https://example.com/errors/forbidden","title":"Forbidden","status":403,"detail":"Access is forbidden with the provided credentials."}
+
++ Response 404 (application/problem+json)
+
+        Not Found
+
+    + Attributes (Problem)
+
+    + Body
+
+            {"type":"https://example.com/errors/not-found","title":"Not Found","status":404,"detail":"The requested resource was not found."}
+
++ Response 429 (application/problem+json)
+
+        Too Many Requests
+
+    + Attributes (Problem)
+
+    + Body
+
+            {"type":"https://example.com/errors/too-many-requests","title":"Too Many Requests","status":429,"detail":"You have exceeded the rate limit."}
+
++ Response 500 (application/problem+json)
+
+        Internal Server Error
+
+    + Attributes (Problem)
+
+    + Body
+
+            {"type":"https://example.com/errors/internal-server-error","title":"Internal Server Error","status":500,"detail":"An unexpected error occurred."}
+
+### Delete booking [DELETE]
+Deletes a booking, cancelling the hold on the trip.
+
++ Response 204 
+
+        Booking deleted
+
+
+
+
++ Response 400 (application/problem+json)
+
+        Bad Request
+
+    + Attributes (Problem)
+
+    + Body
+
+            {"type":"https://example.com/errors/bad-request","title":"Bad Request","status":400,"detail":"The request is invalid or missing required parameters."}
+
++ Response 401 (application/problem+json)
+
+        Unauthorized
+
+    + Attributes (Problem)
+
+    + Body
+
+            {"type":"https://example.com/errors/unauthorized","title":"Unauthorized","status":401,"detail":"You do not have the necessary permissions."}
+
++ Response 403 (application/problem+json)
+
+        Forbidden
+
+    + Attributes (Problem)
+
+    + Body
+
+            {"type":"https://example.com/errors/forbidden","title":"Forbidden","status":403,"detail":"Access is forbidden with the provided credentials."}
+
++ Response 404 (application/problem+json)
+
+        Not Found
+
+    + Attributes (Problem)
+
+    + Body
+
+            {"type":"https://example.com/errors/not-found","title":"Not Found","status":404,"detail":"The requested resource was not found."}
+
++ Response 429 (application/problem+json)
+
+        Too Many Requests
+
+    + Attributes (Problem)
+
+    + Body
+
+            {"type":"https://example.com/errors/too-many-requests","title":"Too Many Requests","status":429,"detail":"You have exceeded the rate limit."}
+
++ Response 500 (application/problem+json)
+
+        Internal Server Error
+
+    + Attributes (Problem)
+
+    + Body
+
+            {"type":"https://example.com/errors/internal-server-error","title":"Internal Server Error","status":500,"detail":"An unexpected error occurred."}
+
+
+
+# Group Payments
+
+Pay for bookings using a card or bank account, and view payment
+status and history.
+
+> warn
+> Bookings usually expire within 1 hour so you'll need to make your payment
+> before the expiry date 
+
+
+## Bookings Payment By BookingId [/bookings/{bookingId}/payment]
+
++ Parameters
+    + bookingId (string, required)
+
+        The ID of the booking to pay for.
+
+        + Sample: 1725ff48-ab45-4bb5-9d02-88745177dedb
+
+### Create booking payment [POST]
+A payment is an attempt to pay for the booking, which will confirm the booking for the user and enable them to get their tickets.
+
++ Request (application/json)
+
+    + Attributes (BookingPayment)
+
+
+    + Body
+
+            {
+                "amount": 49.99,
+                "currency": "gbp",
+                "source": {
+                    "object": "card",
+                    "name": "J. Doe",
+                    "number": "4242424242424242",
+                    "cvc": "123",
+                    "exp_month": 12,
+                    "exp_year": 2025,
+                    "address_line1": "123 Fake Street",
+                    "address_line2": "4th Floor",
+                    "address_city": "London",
+                    "address_country": "gb",
+                    "address_post_code": "N12 9XX"
+                }
+            }
+
+
++ Response 200 (application/json)
+
+        Payment successful
+
+    + Attributes (Bookings Payment Response)
+
+
+    + Body
+
+            {"id":"2e3b4f5a-6b7c-8d9e-0f1a-2b3c4d5e6f7a","amount":49.99,"currency":"gbp","source":{"object":"card","name":"J. Doe","number":"************4242","cvc":"123","exp_month":12,"exp_year":2025,"address_country":"gb","address_post_code":"N12 9XX"},"status":"succeeded","links":{"booking":"https://api.example.com/bookings/1725ff48-ab45-4bb5-9d02-88745177dedb/payment"}}
+
+
++ Response 400 (application/problem+json)
+
+        Bad Request
+
+    + Attributes (Problem)
+
+    + Body
+
+            {"type":"https://example.com/errors/bad-request","title":"Bad Request","status":400,"detail":"The request is invalid or missing required parameters."}
+
++ Response 401 (application/problem+json)
+
+        Unauthorized
+
+    + Attributes (Problem)
+
+    + Body
+
+            {"type":"https://example.com/errors/unauthorized","title":"Unauthorized","status":401,"detail":"You do not have the necessary permissions."}
+
++ Response 403 (application/problem+json)
+
+        Forbidden
+
+    + Attributes (Problem)
+
+    + Body
+
+            {"type":"https://example.com/errors/forbidden","title":"Forbidden","status":403,"detail":"Access is forbidden with the provided credentials."}
+
++ Response 429 (application/problem+json)
+
+        Too Many Requests
+
+    + Attributes (Problem)
+
+    + Body
+
+            {"type":"https://example.com/errors/too-many-requests","title":"Too Many Requests","status":429,"detail":"You have exceeded the rate limit."}
+
++ Response 500 (application/problem+json)
+
+        Internal Server Error
+
+    + Attributes (Problem)
+
+    + Body
+
+            {"type":"https://example.com/errors/internal-server-error","title":"Internal Server Error","status":500,"detail":"An unexpected error occurred."}
+
+
+
+# Data Structures
+
+## Station (object)
+A train station.
+
+### Properties
++ `id`: `<id>efdbb9d1-02c2-4bc3-afb7-6788d8782b1e</id>` (string, required) - Unique identifier for the station.
++ `name`: `<name>Berlin Hauptbahnhof</name>` (string, required) - The name of the station
++ `address`: `<address>Invalidenstraße 10557 Berlin, Germany</address>` (string, required) - The address of the station.
++ `country_code`: `<country_code>DE</country_code>` (string, required) - The country code of the station.
++ `timezone`: `<timezone>Europe/Berlin</timezone>` (string, optional) - The timezone of the station in the [IANA Time Zone Database format](https://www.iana.org/time-zones).
+
+
+## LinksSelf (object)
+The link to the current resource.
+
+### Properties
++ `self` (string, optional) 
+
+
+## LinksDestination (object)
+The link to the destination station resource.
+
+### Properties
++ `self` (string, optional) 
+
+
+## LinksOrigin (object)
+The link to the origin station resource.
+
+### Properties
++ `self` (string, optional) 
+
+
+## LinksPagination (object)
+Links to the next and previous pages of a paginated response.
+
+### Properties
++ `next` (string, optional) 
++ `prev` (string, optional) 
+
+
+## Problem (object)
+A problem detail object as defined in RFC 7807.
+
+### Properties
++ `type` (string, optional) - A URI reference that identifies the problem type
++ `title` (string, optional) - A short, human-readable summary of the problem type
++ `detail` (string, optional) - A human-readable explanation specific to this occurrence of the problem
++ `instance` (string, optional) - A URI reference that identifies the specific occurrence of the problem
++ `status` (number, optional) - The HTTP status code
+
+
+## Trip (object)
+A train trip.
+
+### Properties
++ `id` (string, optional) - Unique identifier for the trip
++ `origin`: `<origin>efdbb9d1-02c2-4bc3-afb7-6788d8782b1e</origin>` (string, optional) - The starting station of the trip
++ `destination`: `<destination>b2e783e1-c824-4d63-b37a-d8d698862f1d</destination>` (string, optional) - The destination station of the trip
++ `departure_time` (string, optional) - The date and time when the trip departs
++ `arrival_time` (string, optional) - The date and time when the trip arrives
++ `operator`: `<operator>Deutsche Bahn</operator>` (string, optional) - The name of the operator of the trip
++ `price` (number, optional) - The cost of the trip
++ `bicycles_allowed` (boolean, optional) - Indicates whether bicycles are allowed on the trip
++ `dogs_allowed` (boolean, optional) - Indicates whether dogs are allowed on the trip
+
+
+## Booking (object)
+A booking for a train trip.
+
+### Properties
++ `id` (string, optional) - Unique identifier for the booking
++ `trip_id` (string, optional) - Identifier of the booked trip
++ `passenger_name` (string, optional) - Name of the passenger
++ `has_bicycle` (boolean, optional) - Indicates whether the passenger has a bicycle.
++ `has_dog` (boolean, optional) - Indicates whether the passenger has a dog.
+
+
+## WrapperCollection (object)
+This is a generic request/response wrapper which contains both data and links which serve as hypermedia controls (HATEOAS).
+
+### Properties
++ `data` (array[object], optional) - The wrapper for a collection is an array of objects.
++ `links` (object, optional) - A set of hypermedia links which serve as controls for the client.
+
+
+## BookingPayment (object)
+A payment for a booking.
+
+### Properties
++ `id` (string, optional) - Unique identifier for the payment. This will be a unique identifier for the payment, and is used to reference the payment in other objects.
++ `amount`: `49.99` (number, optional) - Amount intended to be collected by this payment. A positive decimal figure describing the amount to be collected.
++ `currency` (enum[string], optional) - Three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html), in lowercase.
+    + `bam`
+    + `bgn`
+    + `chf`
+    + `eur`
+    + `gbp`
+    + `nok`
+    + `sek`
+    + `try`
++ `source` (string, optional) - The payment source to take the payment from. This can be a card or a bank account. Some of these properties will be hidden on read to protect PII leaking.
++ `status` (enum[string], optional) - The status of the payment, one of `pending`, `succeeded`, or `failed`.
+    + `pending`
+    + `succeeded`
+    + `failed`
+
+
+## LinksBooking (object)
+The link to the booking resource.
+
+### Properties
++ `booking`: `https://api.example.com/bookings/1725ff48-ab45-4bb5-9d02-88745177dedb` (string, optional) 
+
+
+## Bank Account (object)
+A bank account to take payment from. Must be able to make payments in the currency specified in the payment.
+
+### Properties
++ `object` (enum[string], optional) 
+    + `bank_account`
++ `name` (string, required) 
++ `number` (string, required) - The account number for the bank account, in string form. Must be a current account.
++ `sort_code` (string, optional) - The sort code for the bank account, in string form. Must be a six-digit number.
++ `account_type` (enum[string], required) - The type of entity that holds the account. This can be either `individual` or `company`.
+    + `individual`
+    + `company`
++ `bank_name`: `Starling Bank` (string, required) - The name of the bank associated with the routing number.
++ `country` (string, required) - Two-letter country code (ISO 3166-1 alpha-2).
+
+
+## Bookings Payment Response (object)
+
+
+### Properties
++ `id` (string, optional) - Unique identifier for the payment. This will be a unique identifier for the payment, and is used to reference the payment in other objects.
++ `amount`: `49.99` (number, optional) - Amount intended to be collected by this payment. A positive decimal figure describing the amount to be collected.
++ `currency` (enum[string], optional) - Three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html), in lowercase.
+    + `bam`
+    + `bgn`
+    + `chf`
+    + `eur`
+    + `gbp`
+    + `nok`
+    + `sek`
+    + `try`
++ `source` (string, optional) - The payment source to take the payment from. This can be a card or a bank account. Some of these properties will be hidden on read to protect PII leaking.
++ `status` (enum[string], optional) - The status of the payment, one of `pending`, `succeeded`, or `failed`.
+    + `pending`
+    + `succeeded`
+    + `failed`
++ `links` (LinksBooking, optional) - The link to the booking resource.
+
+
+## Bookings Response (object)
+
+
+### Properties
++ `data` (array[Booking], optional) - The wrapper for a collection is an array of objects.
++ `links` (Links, optional) - A set of hypermedia links which serve as controls for the client.
+
+
+## Bookings Response1 (object)
+
+
+### Properties
++ `data` (array[Booking], optional) - The wrapper for a collection is an array of objects.
++ `links` (Links, optional) - A set of hypermedia links which serve as controls for the client.
+
+
+## Bookings Response2 (object)
+
+
+### Properties
++ `id` (string, optional) - Unique identifier for the booking
++ `trip_id` (string, optional) - Identifier of the booked trip
++ `passenger_name`: `John Doe` (string, optional) - Name of the passenger
++ `has_bicycle` (boolean, optional) - Indicates whether the passenger has a bicycle.
++ `has_dog` (boolean, optional) - Indicates whether the passenger has a dog.
++ `links` (LinksSelf, optional) - The link to the current resource.
+
+
+## Card (object)
+A card (debit or credit) to take payment from.
+
+### Properties
++ `object` (enum[string], optional) 
+    + `card`
++ `name`: `Francis Bourgeois` (string, required) - Cardholder's full name as it appears on the card.
++ `number`: `4242424242424242` (string, required) - The card number, as a string without any separators. On read all but the last four digits will be masked for security.
++ `cvc`: `123` (string, required) - Card security code, 3 or 4 digits usually found on the back of the card.
++ `exp_month`: `12` (number, required) - Two-digit number representing the card's expiration month.
++ `exp_year`: `2025` (number, required) - Four-digit number representing the card's expiration year.
++ `address_line1` (string, optional) 
++ `address_line2` (string, optional) 
++ `address_city` (string, optional) 
++ `address_country` (string, required) 
++ `address_post_code` (string, optional) 
+
+
+## Datum (object)
+
+
+### Properties
++ `id` (string, optional) - Unique identifier for the trip
++ `origin`: `efdbb9d1-02c2-4bc3-afb7-6788d8782b1e` (string, optional) - The starting station of the trip
++ `destination`: `b2e783e1-c824-4d63-b37a-d8d698862f1d` (string, optional) - The destination station of the trip
++ `departure_time`: `2024-02-01T10:00:00Z` (string, optional) - The date and time when the trip departs
++ `arrival_time`: `2024-02-01T16:00:00Z` (string, optional) - The date and time when the trip arrives
++ `operator`: `Deutsche Bahn` (string, optional) - The name of the operator of the trip
++ `price`: `50` (number, optional) - The cost of the trip
++ `bicycles_allowed` (boolean, optional) - Indicates whether bicycles are allowed on the trip
++ `dogs_allowed` (boolean, optional) - Indicates whether dogs are allowed on the trip
++ `self` (string, optional) 
+
+
+## Links (object)
+A set of hypermedia links which serve as controls for the client.
+
+### Properties
++ `self` (string, optional) 
++ `next` (string, optional) 
++ `prev` (string, optional) 
+
+
+## Stations Response (object)
+
+
+### Properties
++ `data` (array[Station], optional) - The wrapper for a collection is an array of objects.
++ `links` (Links, optional) - A set of hypermedia links which serve as controls for the client.
+
+
+## Stations Response1 (object)
+
+
+### Properties
++ `data` (array[Station], optional) - The wrapper for a collection is an array of objects.
++ `links` (Links, optional) - A set of hypermedia links which serve as controls for the client.
+
+
+## Trips Response (object)
+
+
+### Properties
++ `data` (array[Datum], optional) - The wrapper for a collection is an array of objects.
++ `links` (Links, optional) - A set of hypermedia links which serve as controls for the client.
+
+
+## Trips Response1 (object)
+
+
+### Properties
++ `data` (array[Trip], optional) - The wrapper for a collection is an array of objects.
++ `links` (Links, optional) - A set of hypermedia links which serve as controls for the client.

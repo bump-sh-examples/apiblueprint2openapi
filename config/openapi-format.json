@@ -1,0 +1,11 @@
+{
+  "sort": true,
+  "casingSet": {
+    "operationId": "kebab-case",
+    "properties": "snake_case"
+  },
+  "generateSet": {
+    "operationIdTemplate": "<method>-<path>",
+    "overwriteExisting": true
+  }
+}

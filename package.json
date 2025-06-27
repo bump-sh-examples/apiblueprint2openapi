@@ -1,0 +1,16 @@
+{
+  "dependencies": {
+    "api-spec-converter": "^2.12.0",
+    "apib2openapi": "^0.1.5",
+    "openapi-format": "^1.27.0"
+  },
+  "scripts": {
+    "apib2openapi": "apib2openapi -i original.apib -o generated/apib2openapi.yaml --yaml",
+    "apib2openapi:upgrade": "openapi-format generated/apib2openapi.yaml -o generated/apib2openapi.31.yaml --convertTo '3.1' -c config/openapi-format.json",
+    "apispecconverter": "api-spec-converter --from api_blueprint --to openapi_3 original.apib > generated/apispecconverter.yaml -s yaml",
+    "apispecconverter:upgrade": "openapi-format generated/apispecconverter.yaml -o generated/apispecconverter.31.yaml --convertTo '3.1' -c config/openapi-format.json",
+    "generate": "npm run apib2openapi && npm run apispecconverter",
+    "upgrade": "npm run apib2openapi:upgrade && npm run apispecconverter:upgrade",
+    "convert": "npm run generate && npm run upgrade"
+  }
+}
